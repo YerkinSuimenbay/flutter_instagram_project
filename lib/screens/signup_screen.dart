@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -16,6 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
+  Uint8List? image;
 
   @override
   void dispose() {
@@ -26,13 +31,22 @@ class _SignupScreenState extends State<SignupScreen> {
     bioController.dispose();
   }
 
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
+
+    setState(() {
+      image = img;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Scaffold(
           body: SafeArea(
-              child: SingleChildScrollView( // this wasn't in tutorial
+              child: SingleChildScrollView(
+        // this wasn't in tutorial
         child: Container(
           height: 700, // this wasn't in tutorial
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -51,17 +65,22 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               Stack(
                 children: [
-                  const CircleAvatar(
-                    radius: 64,
-                    backgroundColor: Colors.grey,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1589254065909-b7086229d08c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'),
-                  ),
+                  image != null
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundImage: MemoryImage(image!),
+                        )
+                      : const CircleAvatar(
+                          radius: 64,
+                          backgroundColor: Colors.grey,
+                          backgroundImage: NetworkImage(
+                              'https://images.unsplash.com/photo-1589254065909-b7086229d08c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'),
+                        ),
                   Positioned(
                       bottom: -8,
                       left: 80,
                       child: IconButton(
-                          onPressed: () {},
+                          onPressed: selectImage,
                           icon: const Icon(Icons.add_a_photo)))
                 ],
               ),
